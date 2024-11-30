@@ -3,7 +3,7 @@ import logging
 import uuid
 
 def _logger_setup(filename:str, level=logging.INFO):
-    filename = f"data/logs/{filename}"
+    filename = f"/data/logs/{filename}"
     filename = filename if filename.endswith(".log") else f"{filename}.log"
     loger = logging.getLogger(str(uuid.uuid4()))
     formatter = logging.Formatter("%(asctime)s | %(levelname)s - %(message)s")
