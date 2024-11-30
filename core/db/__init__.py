@@ -13,7 +13,7 @@ class UserData:
 
 class User:
     def __init__(self, uid:int=None, username:str=None, ticketID:int=None):
-        self.connection = sqlite3.connect("data/database.db")
+        self.connection = sqlite3.connect("/data/database.db")
         self.uid = uid
         self.username = username
         self.ticket_id = ticketID

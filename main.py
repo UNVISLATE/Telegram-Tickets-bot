@@ -25,7 +25,7 @@ def start(message: Message):
     user_data = userOBJ.set_language("ru" if userLANGUAGE == "ru" else "en")
     bot.send_message(
         userID,
-        HELLO[userOBJ.userdata.language if userOBJ.userdata.language is not None else "en"]
+        HELLO[userOBJ.userdata.language if userOBJ.userdata.language == "ru" else "en"]
     )
 
 @bot.message_handler(
