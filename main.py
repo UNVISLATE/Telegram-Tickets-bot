@@ -1,4 +1,5 @@
 import logging
+import time
 import uuid
 
 import telebot as tb
@@ -63,46 +64,52 @@ def content_user(message: Message):
             message_thread_id=userTICKET
         )
 
-    if message.content_type == "text":
-        bot.send_message(GROUP_ID, message.text, message_thread_id=userTICKET)
-    elif message.content_type == "video":
-        bot.send_video(
-            GROUP_ID,
-            video=message.video.file_id,
-            caption=message.caption,
-            caption_entities=message.caption_entities,
-            message_thread_id=userTICKET
-        )
-    elif message.content_type == "photo":
-        bot.send_photo(
-            GROUP_ID,
-            photo=message.photo[-1].file_id,
-            caption=message.caption,
-            caption_entities=message.caption_entities,
-            message_thread_id=userTICKET
-        )
-    elif message.content_type == "audio":
-        bot.send_audio(
-            GROUP_ID,
-            audio=message.audio.file_id,
-            caption=message.caption,
-            caption_entities=message.caption_entities,
-            message_thread_id=userTICKET
-        )
-    elif message.content_type == "sticker":
-        bot.send_sticker(
-            GROUP_ID,
-            sticker=message.sticker.file_id,
-            message_thread_id=userTICKET
-        )
-    elif message.content_type == "document":
-        bot.send_document(
-            GROUP_ID,
-            document=message.document.file_id,
-            caption=message.caption,
-            caption_entities=message.caption_entities,
-            message_thread_id=userTICKET
-        )
+    try:
+        if message.content_type == "text":
+            bot.send_message(GROUP_ID, message.text, message_thread_id=userTICKET)
+        elif message.content_type == "video":
+            bot.send_video(
+                GROUP_ID,
+                video=message.video.file_id,
+                caption=message.caption,
+                caption_entities=message.caption_entities,
+                message_thread_id=userTICKET
+            )
+        elif message.content_type == "photo":
+            bot.send_photo(
+                GROUP_ID,
+                photo=message.photo[-1].file_id,
+                caption=message.caption,
+                caption_entities=message.caption_entities,
+                message_thread_id=userTICKET
+            )
+        elif message.content_type == "audio":
+            bot.send_audio(
+                GROUP_ID,
+                audio=message.audio.file_id,
+                caption=message.caption,
+                caption_entities=message.caption_entities,
+                message_thread_id=userTICKET
+            )
+        elif message.content_type == "sticker":
+            bot.send_sticker(
+                GROUP_ID,
+                sticker=message.sticker.file_id,
+                message_thread_id=userTICKET
+            )
+        elif message.content_type == "document":
+            bot.send_document(
+                GROUP_ID,
+                document=message.document.file_id,
+                caption=message.caption,
+                caption_entities=message.caption_entities,
+                message_thread_id=userTICKET
+            )
+    except Exception as err:
+        bot.send_message(message.from_user.id, "При отправке сообщения произошла непредвиденная ошибка\nсейчас вы можете написать @arayas1337 для решения вашей проблемы")
+        bot.send_message(DEV, f"У пользователя @{message.from_user.username} произошла непредвиденная ошибка\nmain.content_user\nerror: {str(err)}")
+        loger.error(f"Ошибка отправки сообщения \n error: {str(err)}")
+
 
 
 @bot.message_handler(
@@ -168,8 +175,14 @@ def content_admin(message: Message):
                         caption_entities=message.caption_entities
                     )
             except Exception as err:
-                bot.reply_to(message, "Ошибка при отправке контента пользователю. Пользователь не найден или внутренняя ошибка telegram bot API.")
-                loger.error(f"Ошибка отправки сообщения | error: {str(err)}")
+                bot.reply_to(message, "Ошибка при отправке контента пользователю. Пользователь удалил чат или заблокировал бота.")
+                bot.send_message(
+                    DEV,
+                    f"У администратора @{message.from_user.username} произошла непредвиденная ошибка\n"
+                    f"main.content_user\n"
+                    f"error: {str(err)}"
+                )
+                loger.error(f"Ошибка отправки сообщения \n error: {str(err)}")
         else:
             bot.reply_to(
                 message,
@@ -179,10 +192,17 @@ def content_admin(message: Message):
 
 @bot.message_handler(content_types=content_type_service)
 def sys_message_clean(message: Message):
-    bot.delete_message(message.chat.id,message.message_id)
+    try:
+        bot.delete_message(message.chat.id,message.message_id)
+    except Exception as err:
+        loger.warning(f"sys_message_clean | error: {str(err)}")
 
-
-bot.infinity_polling(
-    5,
-    logger_level=logging.DEBUG
-)
+while True:
+    try:
+        bot.infinity_polling(
+            5,
+            logger_level=logging.DEBUG
+        )
+    except Exception as err:
+        bot.send_message(DEV, f"infinity_polling.error | {str(err)}")
+        time.sleep(15)
