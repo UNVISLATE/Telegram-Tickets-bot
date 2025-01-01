@@ -20,3 +20,4 @@ def _logger_setup(filename:str, level=logging.INFO):
 class LoggingConfigurations:
     main = _logger_setup("main", level=logging.INFO)
     db = _logger_setup("db", level=logging.INFO)
+    critical = _logger_setup("critical", level=logging.INFO)
