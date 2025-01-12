@@ -30,7 +30,7 @@ class Messages:
                         msg_id.message_id,
                         ticket_id,
                         message.text if message.content_type == "text" else message.content_type,
-                        message.date,
+                        message.date.real,
                         user_id
                     )
                 )

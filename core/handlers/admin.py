@@ -41,7 +41,7 @@ def my_rate(message: Message):
         bot.send_message(message.chat.id, "Оценок не найдено.", message_thread_id=message.message_thread_id)
     Rates.exit()
 
-@bot.message_handler(commands=['rate'], chat_types="supergroup")
+@bot.message_handler(commands=['rate_ping'], chat_types="supergroup")
 def rate(message: Message):
     messageID = message.id
     adminID = message.from_user.id
@@ -64,3 +64,32 @@ def rate(message: Message):
         else:
             bot.reply_to(message,"userID для этого топика не найден.")
         userD.exit()
+
+@bot.message_handler(commands=['rate_history'], chat_types=["supergroup", "private"])
+def rate_history(message: Message):
+    Rates = AdminRate(message.from_user.id)
+    my_rates_list = Rates.get_rate()
+    if my_rates_list is not None:
+        rates_list_msg = ""
+        rate_num = 0
+        for rate_data in my_rates_list:
+            if rate_num < 10:
+                rates_list_msg += (
+                    f"UID: {rate_data[3]}\n"
+                    f"date: {rate_data[2]}\n"
+                    f"rate: {rate_data[1]}\n"
+                    f"============\n"
+                )
+            rate_num += 1
+        rates_list_msg += f"0-10/{rate_num}"
+        my_rates_list = [rate_obj[1] for rate_obj in my_rates_list]
+        average_rating = statistics.mean(my_rates_list)
+        bot.send_message(message.chat.id, rates_list_msg,message_thread_id=message.message_thread_id)
+        bot.send_message(message.chat.id, f"Ваш рейтинг: {round(average_rating, 1)}", message_thread_id=message.message_thread_id)
+    else:
+        bot.send_message(message.chat.id, "Оценок не найдено.", message_thread_id=message.message_thread_id)
+    Rates.exit()
+
+@bot.message_handler(commands=['ban'], chat_types=["supergroup"])
+def ban_user(message: Message):
+    bot.reply_to(message, "Будет позже\nТерпи) XD")

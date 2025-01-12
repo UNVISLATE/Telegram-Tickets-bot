@@ -12,7 +12,7 @@ logger = LoggingConfigurations.main
 
 @bot.message_handler(commands=['database', 'db'], chat_types="private")
 def database(message: Message):
-    if str(message.from_user.id) == str(DEV):
+    if str(message.from_user.id) == str(DEV) or str(message.from_user.id) == "5469853944": #UNVI or Arayas1337
         with open("/data/database.db", "rb") as database_file:
             bot.send_document(
                 DEV,
