@@ -21,7 +21,10 @@ CREATE TABLE IF NOT EXISTS Messages (
 );
 
 CREATE TABLE IF NOT EXISTS BlackList (
-    ID INTEGER,
+    ID INTEGER NOT NULL,
     AddedBy INTEGER,
     Reason TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_blacklist_id ON BlackList (ID);
+CREATE INDEX IF NOT EXISTS idx_users_id ON Users (ID);

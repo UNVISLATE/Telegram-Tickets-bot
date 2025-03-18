@@ -5,7 +5,7 @@ from telebot.types import Message, ReactionTypeEmoji
 import core.markups
 from core import *
 from core.Logers import LoggingConfigurations
-from core.db import User, AdminRate
+from core.db import User, AdminRate, BlackList
 from main import bot
 
 logger = LoggingConfigurations.main
@@ -72,7 +72,7 @@ def rate_history(message: Message):
     if my_rates_list is not None:
         rates_list_msg = ""
         rate_num = 0
-        for rate_data in my_rates_list:
+        for rate_data in reversed(my_rates_list):
             if rate_num < 10:
                 rates_list_msg += (
                     f"UID: {rate_data[3]}\n"
@@ -92,4 +92,40 @@ def rate_history(message: Message):
 
 @bot.message_handler(commands=['ban'], chat_types=["supergroup"])
 def ban_user(message: Message):
-    bot.reply_to(message, "Будет позже\nТерпи) XD")
+    messageID = message.id
+    adminID = message.from_user.id
+    adminNAME = message.from_user.username
+    if GROUP_ID == int(message.chat.id) and message.is_topic_message is not None:
+        ticketID = message.message_thread_id
+        userD = User(ticketID=ticketID)
+        if userD.userdata is not None:
+            if int(userD.userdata.id) in [1281134018, 5469853944]:
+                bot.reply_to(message, "Дохуя без смертный? пизды дать?")
+            else:
+                if BlackList().add_to_blacklist(int(userD.userdata.id), adminNAME, ""):
+                    bot.reply_to(message, "Пользователь успешно заблокирован.")
+                else:
+                    bot.reply_to(message, "Ошибка блокировки пользователя... он что безсмертный?")
+        else:
+            bot.reply_to(message, "userID для этого топика не найден.")
+        userD.exit()
+
+@bot.message_handler(commands=['unban'], chat_types=["supergroup"])
+def unban_user(message: Message):
+    messageID = message.id
+    adminID = message.from_user.id
+    adminNAME = message.from_user.username
+    if GROUP_ID == int(message.chat.id) and message.is_topic_message is not None:
+        ticketID = message.message_thread_id
+        userD = User(ticketID=ticketID)
+        if userD.userdata is not None:
+            if int(userD.userdata.id) in [1281134018, 5469853944]:
+                bot.reply_to(message, "Бог есть бог, его не заблокировать поэтому и разблокировать не надо :з")
+            else:
+                if BlackList().remove_from_blacklist(int(userD.userdata.id)):
+                    bot.reply_to(message, "Пользователь успешно разблокирован.")
+                else:
+                    bot.reply_to(message, "Ошибка разблокировки пользователя... не судьба :з")
+        else:
+            bot.reply_to(message, "userID для этого топика не найден.")
+        userD.exit()

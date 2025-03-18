@@ -1,9 +1,12 @@
-from dataclasses import dataclass
 import logging
 import uuid
+from dataclasses import dataclass
+
+from ..config import APP_PATHS as PATH
+
 
 def _logger_setup(filename:str, level=logging.INFO):
-    filename = f"data/logs/{filename}"
+    filename = f"{PATH["logs"]}{filename}"
     filename = filename if filename.endswith(".log") else f"{filename}.log"
     loger = logging.getLogger(str(uuid.uuid4()))
     formatter = logging.Formatter("%(asctime)s | %(levelname)s - %(message)s")
